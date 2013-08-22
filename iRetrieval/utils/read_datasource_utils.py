@@ -10,23 +10,18 @@ from abc import ABCMeta, abstractmethod
 from iRetrieval.errors.errors import ParamError
 
 
-class ReaderName():
-	""" Класс для чтения имен источников """
+class ReaderSourceData():
+	""" Класс для чтения данных по источникам """
 
 	__metaclass__ = ABCMeta
 
 	@abstractmethod
-	def getSourceName(self):
-		"""
-		Получение имен источников (lazy)
-
-		:rtype:  tuple
-		:return:  имя источника в неизмененной кодировке
-		"""
-		return None
+	def getSourceCustom(self):
+		""" Получение данных по источнику (lazy) """
+		yield None
 
 
-class ReaderNameFS(ReaderName):
+class ReaderNameFS(ReaderSourceData):
 
 	def __init__(self, listPaths):
 		"""
@@ -41,7 +36,12 @@ class ReaderNameFS(ReaderName):
 
 		self.__listPaths = listPaths
 
-	def getSourceName(self):
+	def getSourceCustom(self):
+		"""
+		Получение данных по источнику (lazy)
+
+		Для файловой системы - это путь к файлу в неизменненой кодировке
+		"""
 		for itemPath in self.__listPaths:
 			for root, dirName, fileNames in walk(itemPath):
 				for itemFileName in fileNames:

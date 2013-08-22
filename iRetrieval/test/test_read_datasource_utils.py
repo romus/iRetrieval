@@ -6,8 +6,9 @@ __author__ = 'romus'
 
 import os
 import unittest
+from statistic4text.utils.source_data_utils import FileSource, FileSourceCustom
 from iRetrieval.errors.errors import ParamError
-from iRetrieval.utils.read_name_utils import ReaderNameFS
+from iRetrieval.utils.read_datasource_utils import ReaderNameFS
 
 
 class TestReaderNameFS(unittest.TestCase):
@@ -23,6 +24,11 @@ class TestReaderNameFS(unittest.TestCase):
 		firstPath = os.path.join(self.__dirPath, "resources/first")
 		secondPath = os.path.join(self.__dirPath, "resources/second")
 		readerNameFS = ReaderNameFS([firstPath, secondPath])
-		for itemFile in readerNameFS.getSourceName():
-			self.assertIsNotNone(itemFile, "filename is not to be a None object")
+		fileSource = FileSource()
+		fileSourceCustom = FileSourceCustom()
+		for itemFile in readerNameFS.getSourceCustom():
+			fileSourceCustom.custom = itemFile
+			openSource = fileSource.openSource(fileSourceCustom.custom)
+			self.assertIsNotNone(fileSource.getName(openSource), "filename is not to be a None object")
+			fileSource.closeSource(openSource)
 
