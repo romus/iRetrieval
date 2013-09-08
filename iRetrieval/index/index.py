@@ -13,6 +13,20 @@ class Index():
 	__metaclass__ = ABCMeta
 
 	@abstractmethod
+	def createStatistics(self, dataSourceWorker):
+		"""
+		Создание статистики по источникам
+
+		:param dataSourceWorker:  объект для работы с источниками (настроки для работы с источниками и тд)
+		"""
+		pass
+
+	@abstractmethod
+	def createTotalStatistics(self):
+		""" Создание статистики по всем источникам с данными """
+		pass
+
+	@abstractmethod
 	def createSourceNameIndex(self, customCallback, parseSourceNameCallback, sourceCallback):
 		"""
 		Создание индекса по именам источников
@@ -36,6 +50,12 @@ class Index():
 class MongoIndex(Index):
 
 	def __init__(self, mongoUtils):
+		pass
+
+	def createStatistics(self, dataSourceWorker):
+		pass
+
+	def createTotalStatistics(self):
 		pass
 
 	def createSourceNameIndex(self, customCallback, parseSourceNameCallback, sourceCallback):
