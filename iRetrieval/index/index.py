@@ -16,6 +16,7 @@ class Index():
 	def createStatistics(self, dataSourceWorker):
 		"""
 		Создание статистики по источникам
+		(должен вызываться до методов создания индекса)
 
 		:param dataSourceWorker:  объект для работы с источниками (настроки для работы с источниками и тд)
 		"""
@@ -23,7 +24,10 @@ class Index():
 
 	@abstractmethod
 	def createTotalStatistics(self):
-		""" Создание статистики по всем источникам с данными """
+		"""
+		Создание статистики по всем источникам с данными
+		(должен вызываться после метода createStatistics, до методов создания индекса)
+		"""
 		pass
 
 	@abstractmethod

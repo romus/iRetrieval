@@ -45,9 +45,9 @@ class ReaderNameFS(ReaderSourceData):
 		:param listPaths:  список путей файловой системы для получения имен файлов
 		"""
 		if not listPaths:
-			raise ParamError("listPaths can't to be a None or empty")
+			raise ParamError("listPaths cannot be the None-object or empty")
 		if not isinstance(listPaths, list):
-			raise TypeError("listPaths can to be the list type")
+			raise TypeError("listPaths can be the list type")
 
 		self.__listPaths = listPaths
 
@@ -59,7 +59,7 @@ class ReaderNameFS(ReaderSourceData):
 		"""
 		if checkSourceCustomCallback:
 			if not isinstance(checkSourceCustomCallback, FSSourceCustomCallback):
-				raise TypeError("checkSourceCustomCallback can to be the FSSourceCustomCallback type")
+				raise TypeError("checkSourceCustomCallback can be the FSSourceCustomCallback type")
 
 		for itemPath in self.__listPaths:
 			for root, dirName, fileNames in walk(itemPath):
@@ -83,7 +83,7 @@ class FSSourceCustomCallback(SourceCustomCallback):
 		"""
 		if protectEnds:
 			if not isinstance(protectEnds, list):
-				raise TypeError("protectEnds can to be the list type")
+				raise TypeError("protectEnds can be the list type")
 			self.__protectEnds = protectEnds
 		else:
 			self.__protectEnds = [".c", ".cpp", ".py", ".java", ".html", ".css", ".zip"]
