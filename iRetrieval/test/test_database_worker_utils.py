@@ -3,6 +3,7 @@
 
 __author__ = 'romus'
 
+
 import os
 import unittest
 from statistic4text.errors.errors import DataNotFound
@@ -53,17 +54,3 @@ class TestDataSourceWorkerFS(unittest.TestCase):
 		self.assertRaises(TypeError, fsWorker.createStatistics, 1, 2, 3, 4, 5)
 		self.assertRaises(TypeError, fsWorker.createStatistics, self.__ms, 2, 3, 4, 5)
 		self.assertRaises(TypeError, fsWorker.createStatistics, self.__ms, self.__rnFS, self.__fbs, self.__simN, 5)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
