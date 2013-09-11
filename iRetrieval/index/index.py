@@ -5,6 +5,10 @@ __author__ = 'romus'
 
 
 from abc import ABCMeta, abstractmethod
+from statistic4text.utils.save_utils import MongoSaveUtils
+from statistic4text.statistic.statistic import StatisticFactory, MONGO_TYPE
+from iRetrieval.errors.errors import ParamError
+from iRetrieval.utils.datasource_worker_utils import DataSourceWorker
 
 
 class Index():
@@ -13,12 +17,16 @@ class Index():
 	__metaclass__ = ABCMeta
 
 	@abstractmethod
-	def createStatistics(self, dataSourceWorker):
+	def createStatistics(self, dataSourceWorker, readerSourceData, source, normalization, sourceCustomCallback=None):
 		"""
 		Создание статистики по источникам
 		(должен вызываться до методов создания индекса)
 
 		:param dataSourceWorker:  объект для работы с источниками (настроки для работы с источниками и тд)
+		:param readerSourceData:  объект для получения настроект для работы с источниками
+		:param source:  объект для чтения данных из источника
+		:param normalization:  объект для нормализации данных
+		:param sourceCustomCallback:  колбэк для объекта получения настроек
 		"""
 		pass
 
@@ -54,10 +62,35 @@ class Index():
 class MongoIndex(Index):
 
 	def __init__(self, mongoUtils):
-		pass
+		"""
+		инициализация
 
-	def createStatistics(self, dataSourceWorker):
-		pass
+		:param mongoUtils:  параметры для работы с mongodb
+		"""
+		if not mongoUtils:
+			raise ParamError("mongoUtils cannot be the None-object")
+		if not isinstance(mongoUtils, MongoSaveUtils):
+			raise TypeError("mongoUtils can be the list MongoSaveUtils")
+
+		self.__ms = StatisticFactory().createStatistic(MONGO_TYPE, mongoUtils)
+
+	def createStatistics(self, dataSourceWorker, readerSourceData, source, normalization, sourceCusCallback=None):
+		"""
+		Создание статистики по источникам
+		(должен вызываться до методов создания индекса)
+
+		:param dataSourceWorker:  объект для работы с источниками (настроки для работы с источниками и тд)
+		:param readerSourceData:  объект для получения полных путей к файлам
+		:param source:  объект для чтения данных из файла
+		:param normalization:  объект для нормализации данных
+		:param sourceCusCallback:  колбэк для объекта получения настроек (верификация путей)
+		"""
+		if not dataSourceWorker:
+			raise ParamError("dataSourceWorker cannot be the None-object")
+		if not isinstance(dataSourceWorker, DataSourceWorker):
+			raise TypeError("mongoUtils can be the list MongoSaveUtils")
+
+		dataSourceWorker.createStatistics(self.__ms, readerSourceData, source, normalization, sourceCusCallback)
 
 	def createTotalStatistics(self):
 		pass
