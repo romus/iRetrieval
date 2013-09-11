@@ -75,16 +75,6 @@ class MongoIndex(Index):
 		self.__ms = StatisticFactory().createStatistic(MONGO_TYPE, mongoUtils)
 
 	def createStatistics(self, dataSourceWorker, readerSourceData, source, normalization, sourceCusCallback=None):
-		"""
-		Создание статистики по источникам
-		(должен вызываться до методов создания индекса)
-
-		:param dataSourceWorker:  объект для работы с источниками (настроки для работы с источниками и тд)
-		:param readerSourceData:  объект для получения полных путей к файлам
-		:param source:  объект для чтения данных из файла
-		:param normalization:  объект для нормализации данных
-		:param sourceCusCallback:  колбэк для объекта получения настроек (верификация путей)
-		"""
 		if not dataSourceWorker:
 			raise ParamError("dataSourceWorker cannot be the None-object")
 		if not isinstance(dataSourceWorker, DataSourceWorker):
