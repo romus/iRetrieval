@@ -56,25 +56,3 @@ class TestMongoIndex(unittest.TestCase):
 		mongoIndex = MongoIndex(self.__mongoUtils)
 		self.assertRaises(ParamError, mongoIndex.createStatistics, None, self.__rFS, self.__fbs, self.__smN, self.__scc)
 		self.assertRaises(TypeError, mongoIndex.createStatistics, "1", self.__rFS, self.__fbs, self.__smN, self.__scc)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
