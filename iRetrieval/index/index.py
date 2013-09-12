@@ -90,5 +90,3 @@ class MongoIndex(Index):
 
 	def createSourceDataIndex(self, readSourceDataCallback):
 		pass
-
-
