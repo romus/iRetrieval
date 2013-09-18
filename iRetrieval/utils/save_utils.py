@@ -16,13 +16,13 @@ class SaveRetrievalUtils():
 	__metaclass__ = ABCMeta
 
 	@abstractmethod
-	def saveFilename(self, dictID, nameList, type):
+	def saveFilename(self, dictID, names, fileNamesType):
 		"""
 		Сохранение частей имени источника
 
 		:param dictID:  id источника
-		:param nameList:  список слов, входящих в имя источника
-		:param type:  тип имени источника
+		:param names:  список слов, входящих в имя источника
+		:param fileNamesType:  тип имени источника
 		:return:
 		"""
 		return -1
