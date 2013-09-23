@@ -4,8 +4,8 @@
 __author__ = 'romus'
 
 
-from abc import ABCMeta, abstractmethod
-from zope.interface import Interface
+from zope.interface import Interface, implements
+from statistic4text.utils.save_utils import MongoSaveUtils
 
 
 FILENAME_TYPE = 1  # только имя файла
@@ -27,11 +27,19 @@ class ISaveRetrievalUtils(Interface):
 		return -1
 
 
-class SaveRetrievalUtils():
+class MongoSaveRetrievalUtils(MongoSaveUtils):
 
-	__metaclass__ = ABCMeta
+	implements(ISaveRetrievalUtils)
 
-	@abstractmethod
+	def __init__(self, host, port, user, password, databaseName, filesCollectionName, dataFilesCollectionName,
+				 sourceNameCollection, mergeDictName="merge_dict", isDeleteAll=False):
+		super(MongoSaveRetrievalUtils, self).__init__(host, port, user, password, databaseName, filesCollectionName,
+													  dataFilesCollectionName, mergeDictName, isDeleteAll)
+		self.__sourceNameCollection = self._db[sourceNameCollection]
+
+		if isDeleteAll:
+			self.__sourceNameCollection.remove()
+
 	def saveFilename(self, dictID, names, fileNamesType):
 		"""
 		Сохранение частей имени источника
