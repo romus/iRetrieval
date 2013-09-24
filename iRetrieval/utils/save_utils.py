@@ -4,7 +4,7 @@
 __author__ = 'romus'
 
 
-from zope.interface import Interface, implements
+import zope.interface
 from statistic4text.utils.save_utils import MongoSaveUtils
 
 
@@ -12,7 +12,7 @@ FILENAME_TYPE = 1  # только имя файла
 FILENAME_PATH_TYPE = 2  # путь к файлу
 
 
-class ISaveRetrievalUtils(Interface):
+class ISaveRetrievalUtils(zope.interface.Interface):
 	""" Интерфейс """
 
 	def saveFilename(self, dictID, names, fileNamesType):
@@ -29,7 +29,7 @@ class ISaveRetrievalUtils(Interface):
 
 class MongoSaveRetrievalUtils(MongoSaveUtils):
 
-	implements(ISaveRetrievalUtils)
+	zope.interface.implements(ISaveRetrievalUtils)
 
 	def __init__(self, host, port, user, password, databaseName, filesCollectionName, dataFilesCollectionName,
 				 sourceNameCollection, mergeDictName="merge_dict", isDeleteAll=False):

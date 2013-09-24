@@ -12,6 +12,7 @@ from statistic4text.utils.source_data_utils import FileBlockSource
 from statistic4text.utils.normalization_utils import SimpleNormalization
 from iRetrieval.index.index import MongoIndex
 from iRetrieval.errors.errors import ParamError
+from iRetrieval.utils.save_utils import MongoSaveRetrievalUtils
 from iRetrieval.utils.datasource_worker_utils import DataSourceWorkerFS
 from iRetrieval.utils.read_datasource_utils import FSSourceCustomCallback, ReaderNameFS
 
@@ -26,12 +27,13 @@ class TestMongoIndex(unittest.TestCase):
 		db = "statistic"
 		fc_n = "files"
 		fc_dn = "files_data"
+		snc = "source_names"
 		mdn = "test_merge_dict"
-
 		self.__dirPath = os.path.abspath(os.curdir)
 		firstPath = os.path.join(self.__dirPath, "resources/first")
 		secondPath = os.path.join(self.__dirPath, "resources/second")
-		self.__mongoUtils = MongoSaveUtils(h, p, usr, pwd, db, fc_n, fc_dn, mdn)
+		self.__mongoUtils = MongoSaveRetrievalUtils(h, p, usr, pwd, db, fc_n, fc_dn, snc, mdn)
+		self.__mongoUtilsTypeError = MongoSaveUtils(h, p, usr, pwd, db, fc_n, fc_dn, mdn)
 		self.__smN = SimpleNormalization()
 		self.__fbs = FileBlockSource()
 		self.__scc = FSSourceCustomCallback()
@@ -39,10 +41,8 @@ class TestMongoIndex(unittest.TestCase):
 		self.__fsWorker = DataSourceWorkerFS()
 
 	def tearDown(self):
-		try:
-			self.__mongoUtils.deleteMergeDict()
-		except DataNotFound:
-			pass
+		self.clearCreatedData(self.__mongoUtils)
+		self.clearCreatedData(self.__mongoUtilsTypeError)
 
 	def testCreateStatistics(self):
 		mongoIndex = MongoIndex(self.__mongoUtils)
@@ -51,8 +51,15 @@ class TestMongoIndex(unittest.TestCase):
 	def testInitException(self):
 		self.assertRaises(ParamError, MongoIndex, None)
 		self.assertRaises(TypeError, MongoIndex, "test")
+		self.assertRaises(TypeError, MongoIndex, self.__mongoUtilsTypeError)
 
 	def testCreateStatisticsException(self):
 		mongoIndex = MongoIndex(self.__mongoUtils)
 		self.assertRaises(ParamError, mongoIndex.createStatistics, None, self.__rFS, self.__fbs, self.__smN, self.__scc)
 		self.assertRaises(TypeError, mongoIndex.createStatistics, "1", self.__rFS, self.__fbs, self.__smN, self.__scc)
+
+	def clearCreatedData(self, utils):
+		try:
+			utils.deleteMergeDict()
+		except DataNotFound:
+			pass

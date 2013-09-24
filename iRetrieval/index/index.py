@@ -8,6 +8,7 @@ from abc import ABCMeta, abstractmethod
 from statistic4text.utils.save_utils import MongoSaveUtils
 from statistic4text.statistic.statistic import StatisticFactory, MONGO_TYPE
 from iRetrieval.errors.errors import ParamError
+from iRetrieval.utils.save_utils import ISaveRetrievalUtils
 from iRetrieval.utils.datasource_worker_utils import DataSourceWorker
 
 
@@ -71,6 +72,8 @@ class MongoIndex(Index):
 			raise ParamError("mongoUtils cannot be the None-object")
 		if not isinstance(mongoUtils, MongoSaveUtils):
 			raise TypeError("mongoUtils can be the list MongoSaveUtils")
+		if not ISaveRetrievalUtils.providedBy(mongoUtils):
+			raise TypeError("mongoUtils is not provided by ISaveRetrievalUtils")
 
 		self.__ms = StatisticFactory().createStatistic(MONGO_TYPE, mongoUtils)
 
@@ -83,7 +86,7 @@ class MongoIndex(Index):
 		dataSourceWorker.createStatistics(self.__ms, readerSourceData, source, normalization, sourceCusCallback)
 
 	def createTotalStatistics(self):
-		pass
+		self.__ms.makeTotalStatistic()
 
 	def createSourceNameIndex(self, customCallback, parseSourceNameCallback, sourceCallback):
 		pass
