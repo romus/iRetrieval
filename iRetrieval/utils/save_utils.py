@@ -79,4 +79,3 @@ class MongoSaveRetrievalUtils(MongoSaveUtils):
 		""" Помимо данных из основных коллекций, данные удаляются еще и из коллекции  sourceNameCollection"""
 		super(MongoSaveRetrievalUtils, self).deleteDicts()
 		self.__sourceNameCollection.remove()
-

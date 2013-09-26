@@ -4,12 +4,15 @@
 __author__ = 'romus'
 
 
+import os
 from abc import ABCMeta, abstractmethod
 from statistic4text.utils.save_utils import MongoSaveUtils
+from statistic4text.utils.read_utils import MongoReadUtils
 from statistic4text.statistic.statistic import StatisticFactory, MONGO_TYPE
 from iRetrieval.errors.errors import ParamError
-from iRetrieval.utils.save_utils import ISaveRetrievalUtils
 from iRetrieval.utils.datasource_worker_utils import DataSourceWorker
+from iRetrieval.utils.normalization_utils import FileNameNormalization
+from iRetrieval.utils.save_utils import ISaveRetrievalUtils, FILENAME_PATH_TYPE, FILENAME_TYPE
 
 
 class Index():
@@ -40,13 +43,11 @@ class Index():
 		pass
 
 	@abstractmethod
-	def createSourceNameIndex(self, customCallback, parseSourceNameCallback, sourceCallback):
+	def createSourceNameIndex(self, parseSourceNameCallback):
 		"""
 		Создание индекса по именам источников
 
-		:param customCallback:  колбэк для получения данных для работы с источниками
 		:param parseSourceNameCallback:  колбэк для обработки имени источника
-		:param sourceCallback:  колбэк для работы с источниками
 		"""
 		pass
 
@@ -62,20 +63,28 @@ class Index():
 
 class MongoIndex(Index):
 
-	def __init__(self, mongoUtils):
+	def __init__(self, mongoSaveUtils, mongoReadUtils):
 		"""
 		инициализация
 
-		:param mongoUtils:  параметры для работы с mongodb
+		:param mongoSaveUtils:  параметры для записи данных в mongodb
+		:param mongoReadUtils:  параметры для чтения данных из mongodb
 		"""
-		if not mongoUtils:
+		if not mongoSaveUtils:
 			raise ParamError("mongoUtils cannot be the None-object")
-		if not isinstance(mongoUtils, MongoSaveUtils):
+		if not isinstance(mongoSaveUtils, MongoSaveUtils):
 			raise TypeError("mongoUtils can be the list MongoSaveUtils")
-		if not ISaveRetrievalUtils.providedBy(mongoUtils):
+		if not ISaveRetrievalUtils.providedBy(mongoSaveUtils):
 			raise TypeError("mongoUtils is not provided by ISaveRetrievalUtils")
 
-		self.__ms = StatisticFactory().createStatistic(MONGO_TYPE, mongoUtils)
+		if not mongoReadUtils:
+			raise ParamError("mongoReadUtils cannot be the None-object")
+		if not isinstance(mongoReadUtils, MongoReadUtils):
+			raise TypeError("mongoReadUtils can be the list MongoReadUtils")
+
+		self.__mongoSaveUtils = mongoSaveUtils
+		self.__mongoReadUtils = mongoReadUtils
+		self.__ms = StatisticFactory().createStatistic(MONGO_TYPE, self.__mongoSaveUtils)
 
 	def createStatistics(self, dataSourceWorker, readerSourceData, source, normalization, sourceCusCallback=None):
 		if not dataSourceWorker:
@@ -88,8 +97,27 @@ class MongoIndex(Index):
 	def createTotalStatistics(self):
 		self.__ms.makeTotalStatistic()
 
-	def createSourceNameIndex(self, customCallback, parseSourceNameCallback, sourceCallback):
-		pass
+	def createSourceNameIndex(self, parseSourceNameCallback):
+		"""
+		Создание индекса по полным именам файлов
+
+		:param parseSourceNameCallback:  колбэк для обработки имен источников
+		"""
+		if not parseSourceNameCallback:
+			raise ParamError("parseSourceNameCallback cannot be the None-object")
+		if not isinstance(parseSourceNameCallback, FileNameNormalization):
+			raise TypeError("parseSourceNameCallback can be the list FileNameNormalization")
+
+		for file_data in self.__mongoReadUtils.getSubDicts(self.__ms.getMainStatisticID()):
+			# получение кортежа '/opt/test dir/file.txt' -> ('/opt/test dir', 'file.txt')
+			name_node = os.path.split(file_data['dict_name'])
+			try:
+				paths = parseSourceNameCallback.normalizeTextWithoutRepetition(name_node[0])
+				self.__mongoSaveUtils.saveFilename(file_data['_id'], paths, FILENAME_PATH_TYPE)
+				names = parseSourceNameCallback.normalizeTextWithoutRepetition(name_node[1])
+				self.__mongoSaveUtils.saveFilename(file_data['_id'], names, FILENAME_TYPE)
+			except IndexError as e:
+				pass
 
 	def createSourceDataIndex(self, readSourceDataCallback):
 		pass

@@ -8,6 +8,7 @@ import os
 import unittest
 from statistic4text.errors.errors import DataNotFound
 from statistic4text.utils.save_utils import MongoSaveUtils
+from statistic4text.utils.read_utils import MongoReadUtils
 from statistic4text.utils.source_data_utils import FileBlockSource
 from statistic4text.utils.normalization_utils import SimpleNormalization
 from iRetrieval.index.index import MongoIndex
@@ -34,6 +35,7 @@ class TestMongoIndex(unittest.TestCase):
 		secondPath = os.path.join(self.__dirPath, "resources/second")
 		self.__mongoUtils = MongoSaveRetrievalUtils(h, p, usr, pwd, db, fc_n, fc_dn, snc, mdn)
 		self.__mongoUtilsTypeError = MongoSaveUtils(h, p, usr, pwd, db, fc_n, fc_dn, mdn)
+		self.__mongoReadUtils = MongoReadUtils(h, p, usr, pwd, db, fc_n, fc_dn)
 		self.__smN = SimpleNormalization()
 		self.__fbs = FileBlockSource()
 		self.__scc = FSSourceCustomCallback()
@@ -45,16 +47,18 @@ class TestMongoIndex(unittest.TestCase):
 		self.clearCreatedData(self.__mongoUtilsTypeError)
 
 	def testCreateStatistics(self):
-		mongoIndex = MongoIndex(self.__mongoUtils)
+		mongoIndex = MongoIndex(self.__mongoUtils, self.__mongoReadUtils)
 		mongoIndex.createStatistics(self.__fsWorker, self.__rFS, self.__fbs, self.__smN, self.__scc)
 
 	def testInitException(self):
-		self.assertRaises(ParamError, MongoIndex, None)
-		self.assertRaises(TypeError, MongoIndex, "test")
-		self.assertRaises(TypeError, MongoIndex, self.__mongoUtilsTypeError)
+		self.assertRaises(ParamError, MongoIndex, None, self.__mongoReadUtils)
+		self.assertRaises(TypeError, MongoIndex, "test", self.__mongoReadUtils)
+		self.assertRaises(TypeError, MongoIndex, self.__mongoUtilsTypeError, self.__mongoReadUtils)
+		self.assertRaises(ParamError, MongoIndex, self.__mongoUtils, None)
+		self.assertRaises(TypeError, MongoIndex, self.__mongoUtils, "test")
 
 	def testCreateStatisticsException(self):
-		mongoIndex = MongoIndex(self.__mongoUtils)
+		mongoIndex = MongoIndex(self.__mongoUtils, self.__mongoReadUtils)
 		self.assertRaises(ParamError, mongoIndex.createStatistics, None, self.__rFS, self.__fbs, self.__smN, self.__scc)
 		self.assertRaises(TypeError, mongoIndex.createStatistics, "1", self.__rFS, self.__fbs, self.__smN, self.__scc)
 
