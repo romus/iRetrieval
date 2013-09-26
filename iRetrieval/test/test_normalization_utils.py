@@ -15,8 +15,12 @@ class TestFileNameNormalization(unittest.TestCase):
 		self.__fileNormalization = FileNameNormalization()
 
 	def testNormalizeText(self):
-		words = self.__fileNormalization.normalizeText('/opt/test/some dir/')
+		words = self.__fileNormalization.normalizeText('/opt/some dir/file.txt')
 		for word in words:
+			self.assertIsNotNone(word, "empty word")
+
+		words2 = self.__fileNormalization.normalizeText('C:\\some dir\\file.txt')
+		for word in words2:
 			self.assertIsNotNone(word, "empty word")
 
 	def testNormalizeTextException(self):
