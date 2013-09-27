@@ -4,10 +4,13 @@
 __author__ = 'romus'
 
 
+import os
 from abc import ABCMeta, abstractmethod
 from statistic4text.statistic.statistic import Statistic
 from statistic4text.utils.source_data_utils import FileSourceCustom
 from iRetrieval.errors.errors import ParamError
+from iRetrieval.utils.normalization_utils import FileNameNormalization
+from iRetrieval.utils.save_utils import FILENAME_PATH_TYPE, FILENAME_TYPE
 from iRetrieval.utils.read_datasource_utils import ReaderSourceData, SourceCustomCallback
 
 
@@ -26,6 +29,18 @@ class DataSourceWorker():
 		:param source:  объект для чтения данных из источника
 		:param normalization:  объект для нормализации данных
 		:param sourceCustomCallback:  колбэк для объекта получения настроек
+		"""
+		pass
+
+	@abstractmethod
+	def createSourceNameIndex(self, statisticObject, readSourceUtils, saveSourceUtils, parseSourceNameCallback):
+		"""
+		Создание индекса по названим источников
+
+		:param statisticObject:  объект для создания статистики
+		:param readSourceUtils:  объект для чтения данных статистики
+		:param saveSourceUtils:  объект для сохранения индекса по статистике
+		:param parseSourceNameCallback:  колбэк для обработки имен источников
 		"""
 		pass
 
@@ -48,7 +63,7 @@ class DataSourceWorkerFS(DataSourceWorker):
 		if not statisticObject:
 			raise ParamError("statisticObject cannot be the None-object")
 		if not readerSourceData:
-			raise  ParamError("readerSourceData cannot be the None-object")
+			raise ParamError("readerSourceData cannot be the None-object")
 
 		if not isinstance(statisticObject, Statistic):
 			raise TypeError("statisticObject can be the list Statistic")
@@ -62,3 +77,28 @@ class DataSourceWorkerFS(DataSourceWorker):
 			# TODO определение типа файла
 			fileSourceCustom.custom = itemFile
 			statisticObject.makeDocStatisticCustom(source, fileSourceCustom, normalization)
+
+	def createSourceNameIndex(self, statisticObject, readSourceUtils, saveSourceUtils, parseSourceNameCallback):
+		"""
+		Создание индекса по именам файлов
+
+		:param statisticObject:  объект для создания статистики
+		:param readSourceUtils:  объект для чтения данных статистики
+		:param saveSourceUtils:  объект для сохранения индекса по статистике
+		:param parseSourceNameCallback:  колбэк для обработки имен файлов
+		"""
+		if not parseSourceNameCallback:
+			raise ParamError("parseSourceNameCallback cannot be the None-object")
+		if not isinstance(parseSourceNameCallback, FileNameNormalization):
+			raise TypeError("parseSourceNameCallback can be the list FileNameNormalization")
+
+		for file_data in readSourceUtils.getSubDicts(statisticObject.getMainStatisticID()):
+			# получение кортежа '/opt/test dir/file.txt' -> ('/opt/test dir', 'file.txt')
+			name_node = os.path.split(file_data['dict_name'])
+			try:
+				paths = parseSourceNameCallback.normalizeTextWithoutRepetition(name_node[0])
+				saveSourceUtils.saveFilename(file_data['_id'], paths, FILENAME_PATH_TYPE)
+				names = parseSourceNameCallback.normalizeTextWithoutRepetition(name_node[1])
+				saveSourceUtils.saveFilename(file_data['_id'], names, FILENAME_TYPE)
+			except IndexError as e:
+				pass

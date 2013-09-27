@@ -4,15 +4,13 @@
 __author__ = 'romus'
 
 
-import os
 from abc import ABCMeta, abstractmethod
 from statistic4text.utils.save_utils import MongoSaveUtils
 from statistic4text.utils.read_utils import MongoReadUtils
 from statistic4text.statistic.statistic import StatisticFactory, MONGO_TYPE
 from iRetrieval.errors.errors import ParamError
 from iRetrieval.utils.datasource_worker_utils import DataSourceWorker
-from iRetrieval.utils.normalization_utils import FileNameNormalization
-from iRetrieval.utils.save_utils import ISaveRetrievalUtils, FILENAME_PATH_TYPE, FILENAME_TYPE
+from iRetrieval.utils.save_utils import ISaveRetrievalUtils
 
 
 class Index():
@@ -43,11 +41,12 @@ class Index():
 		pass
 
 	@abstractmethod
-	def createSourceNameIndex(self, parseSourceNameCallback):
+	def createSourceNameIndex(self, dataSourceWorker, parseCallback):
 		"""
 		Создание индекса по именам источников
 
-		:param parseSourceNameCallback:  колбэк для обработки имени источника
+		:param dataSourceWorker:  объект для работы с источниками (настроки для работы с источниками и тд)
+		:param parseCallback:  колбэк для обработки имени источника
 		"""
 		pass
 
@@ -97,27 +96,19 @@ class MongoIndex(Index):
 	def createTotalStatistics(self):
 		self.__ms.makeTotalStatistic()
 
-	def createSourceNameIndex(self, parseSourceNameCallback):
+	def createSourceNameIndex(self, dataSourceWorker, parseCallback):
 		"""
 		Создание индекса по полным именам файлов
 
-		:param parseSourceNameCallback:  колбэк для обработки имен источников
+		:param dataSourceWorker:  объект для работы с источниками (настроки для работы с источниками и тд)
+		:param parseCallback:  колбэк для обработки имен источников
 		"""
-		if not parseSourceNameCallback:
-			raise ParamError("parseSourceNameCallback cannot be the None-object")
-		if not isinstance(parseSourceNameCallback, FileNameNormalization):
-			raise TypeError("parseSourceNameCallback can be the list FileNameNormalization")
+		if not dataSourceWorker:
+			raise ParamError("dataSourceWorker cannot be the None-object")
+		if not isinstance(dataSourceWorker, DataSourceWorker):
+			raise TypeError("mongoUtils can be the list MongoSaveUtils")
 
-		for file_data in self.__mongoReadUtils.getSubDicts(self.__ms.getMainStatisticID()):
-			# получение кортежа '/opt/test dir/file.txt' -> ('/opt/test dir', 'file.txt')
-			name_node = os.path.split(file_data['dict_name'])
-			try:
-				paths = parseSourceNameCallback.normalizeTextWithoutRepetition(name_node[0])
-				self.__mongoSaveUtils.saveFilename(file_data['_id'], paths, FILENAME_PATH_TYPE)
-				names = parseSourceNameCallback.normalizeTextWithoutRepetition(name_node[1])
-				self.__mongoSaveUtils.saveFilename(file_data['_id'], names, FILENAME_TYPE)
-			except IndexError as e:
-				pass
+		dataSourceWorker.createSourceNameIndex(self.__ms, self.__mongoReadUtils, self.__mongoSaveUtils, parseCallback)
 
 	def createSourceDataIndex(self, readSourceDataCallback):
 		pass
