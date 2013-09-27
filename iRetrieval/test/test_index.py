@@ -6,14 +6,17 @@ __author__ = 'romus'
 
 import os
 import unittest
+
 from statistic4text.errors.errors import DataNotFound
 from statistic4text.utils.save_utils import MongoSaveUtils
 from statistic4text.utils.read_utils import MongoReadUtils
 from statistic4text.utils.source_data_utils import FileBlockSource
 from statistic4text.utils.normalization_utils import SimpleNormalization
+
 from iRetrieval.index.index import MongoIndex
 from iRetrieval.errors.errors import ParamError
 from iRetrieval.utils.save_utils import MongoSaveRetrievalUtils
+from iRetrieval.utils.normalization_utils import FileNameNormalization
 from iRetrieval.utils.datasource_worker_utils import DataSourceWorkerFS
 from iRetrieval.utils.read_datasource_utils import FSSourceCustomCallback, ReaderNameFS
 
@@ -61,6 +64,19 @@ class TestMongoIndex(unittest.TestCase):
 		mongoIndex = MongoIndex(self.__mongoUtils, self.__mongoReadUtils)
 		self.assertRaises(ParamError, mongoIndex.createStatistics, None, self.__rFS, self.__fbs, self.__smN, self.__scc)
 		self.assertRaises(TypeError, mongoIndex.createStatistics, "1", self.__rFS, self.__fbs, self.__smN, self.__scc)
+
+	def testCreateSourceNameIndex(self):
+		mongoIndex = MongoIndex(self.__mongoUtils, self.__mongoReadUtils)
+		simNamesN = FileNameNormalization()
+		mongoIndex.createStatistics(self.__fsWorker, self.__rFS, self.__fbs, self.__smN, self.__scc)
+		mongoIndex.createSourceNameIndex(self.__fsWorker, simNamesN)
+
+	def testCreateSourceNameIndexException(self):
+		mongoIndex = MongoIndex(self.__mongoUtils, self.__mongoReadUtils)
+		self.assertRaises(ParamError, mongoIndex.createSourceNameIndex, None, 2)
+		self.assertRaises(TypeError, mongoIndex.createSourceNameIndex, 1, 2)
+		self.assertRaises(ParamError, mongoIndex.createSourceNameIndex, self.__fsWorker, None)
+		self.assertRaises(TypeError, mongoIndex.createSourceNameIndex, self.__fsWorker, 2)
 
 	def clearCreatedData(self, utils):
 		try:

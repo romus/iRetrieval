@@ -6,6 +6,7 @@ __author__ = 'romus'
 
 import pymongo
 import zope.interface
+
 from statistic4text.utils.save_utils import MongoSaveUtils
 from iRetrieval.errors.errors import ParamError
 
@@ -78,4 +79,5 @@ class MongoSaveRetrievalUtils(MongoSaveUtils):
 	def deleteDicts(self):
 		""" Помимо данных из основных коллекций, данные удаляются еще и из коллекции  sourceNameCollection"""
 		super(MongoSaveRetrievalUtils, self).deleteDicts()
+		# TODO необходимо удалять не все данные, а только созданные объектом данного класса
 		self.__sourceNameCollection.remove()

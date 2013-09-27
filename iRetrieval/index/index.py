@@ -5,12 +5,15 @@ __author__ = 'romus'
 
 
 from abc import ABCMeta, abstractmethod
+
 from statistic4text.utils.save_utils import MongoSaveUtils
 from statistic4text.utils.read_utils import MongoReadUtils
 from statistic4text.statistic.statistic import StatisticFactory, MONGO_TYPE
+
 from iRetrieval.errors.errors import ParamError
-from iRetrieval.utils.datasource_worker_utils import DataSourceWorker
 from iRetrieval.utils.save_utils import ISaveRetrievalUtils
+from iRetrieval.utils.datasource_worker_utils import DataSourceWorker
+from iRetrieval.utils.normalization_utils import FileNameNormalization
 
 
 class Index():
@@ -107,6 +110,11 @@ class MongoIndex(Index):
 			raise ParamError("dataSourceWorker cannot be the None-object")
 		if not isinstance(dataSourceWorker, DataSourceWorker):
 			raise TypeError("mongoUtils can be the list MongoSaveUtils")
+
+		if not parseCallback:
+			raise ParamError("parseSourceNameCallback cannot be the None-object")
+		if not isinstance(parseCallback, FileNameNormalization):
+			raise TypeError("parseSourceNameCallback can be the list FileNameNormalization")
 
 		dataSourceWorker.createSourceNameIndex(self.__ms, self.__mongoReadUtils, self.__mongoSaveUtils, parseCallback)
 

@@ -6,6 +6,7 @@ __author__ = 'romus'
 
 import os
 import re
+
 from statistic4text.errors.errors import ParamError
 from statistic4text.utils.normalization_utils import SimpleNormalization
 
@@ -25,9 +26,6 @@ class FileNameNormalization(SimpleNormalization):
 		"""
 		if not text:
 			raise ParamError("Text is not to be the None-object or ''")
-
-		if not isinstance(text, str):
-			raise TypeError("text can be the list str")
 
 		dt = self._detectEncoding.encodeText(text, self._defaultEncodeText)  # dt = decode text
 		normalize_words = []  # normalize words

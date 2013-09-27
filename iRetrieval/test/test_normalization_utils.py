@@ -26,4 +26,3 @@ class TestFileNameNormalization(unittest.TestCase):
 	def testNormalizeTextException(self):
 		self.assertRaises(ParamError, self.__fileNormalization.normalizeText, None)
 		self.assertRaises(ParamError, self.__fileNormalization.normalizeText, '')
-		self.assertRaises(TypeError, self.__fileNormalization.normalizeText, 123)
