@@ -32,7 +32,8 @@ class ISaveRetrievalUtils(zope.interface.Interface):
 class MongoSaveRetrievalUtils(MongoSaveUtils):
 
 	INDEX_FIELDS_SOURCE_NAME_COLLECTION = [("name", pymongo.DESCENDING), ("dict_id", pymongo.DESCENDING),
-										   ("file_name_type", pymongo.DESCENDING)]
+										   ("file_name_type", pymongo.DESCENDING),
+										   ("merge_dict_id", pymongo.DESCENDING)]
 	zope.interface.implements(ISaveRetrievalUtils)
 
 	def __init__(self, host, port, user, password, databaseName, filesCollectionName, dataFilesCollectionName,
@@ -70,14 +71,17 @@ class MongoSaveRetrievalUtils(MongoSaveUtils):
 		if not isinstance(fileNamesType, int):
 			raise TypeError("fileNamesType can be the list int")
 
+		self._checkExistMergeDict()
+
 		if not fileNamesType in self.__type_name:
 			raise TypeError("unsupported fileNamesType")
 
 		for name in names:
-			self.__sourceNameCollection.insert({"name": name, "dict_id": dictID, "file_name_type": fileNamesType})
+			in_d = {"name": name, "dict_id": dictID, "file_name_type": fileNamesType,
+					"merge_dict_id": self.getMergeDictID()}
+			self.__sourceNameCollection.insert(in_d)
 
 	def deleteDicts(self):
 		""" Помимо данных из основных коллекций, данные удаляются еще и из коллекции  sourceNameCollection"""
 		super(MongoSaveRetrievalUtils, self).deleteDicts()
-		# TODO необходимо удалять не все данные, а только созданные объектом данного класса
-		self.__sourceNameCollection.remove()
+		self.__sourceNameCollection.remove({"merge_dict_id": self.getMergeDictID()})
