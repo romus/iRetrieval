@@ -71,10 +71,10 @@ class MongoSaveRetrievalUtils(MongoSaveUtils):
 		if not isinstance(fileNamesType, int):
 			raise TypeError("fileNamesType can be the list int")
 
-		self._checkExistMergeDict()
-
 		if not fileNamesType in self.__type_name:
 			raise TypeError("unsupported fileNamesType")
+
+		self._checkExistMergeDict()
 
 		for name in names:
 			in_d = {"name": name, "dict_id": dictID, "file_name_type": fileNamesType,
