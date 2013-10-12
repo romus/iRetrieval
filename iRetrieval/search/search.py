@@ -22,6 +22,7 @@ class Search():
 		"""
 		return None
 
+	@abstractmethod
 	def searchData(self, query):
 		"""
 		Поиск по данным из источников
