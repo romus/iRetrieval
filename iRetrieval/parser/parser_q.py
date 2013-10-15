@@ -6,12 +6,15 @@ __author__ = 'romus'
 
 from abc import ABCMeta, abstractmethod
 
+from statistic4text.utils.normalization_utils import Normalization
+
 from iRetrieval.errors.errors import ParamError
 
 
 TYPE_Q_LOGIC = 0  # логический поисковый запрос
 TYPE_Q_EXACT = 1  # точный поисковый запрос
 TYPE_Q_IMPRECISE = 2  # неточный поисковый запрос
+TYPE_Q_FULL = 3  # полнотестовый поисковый запрос
 
 
 class ParserQ():
@@ -19,12 +22,13 @@ class ParserQ():
 	__metaclass__ = ABCMeta
 
 	@abstractmethod
-	def parseQ(self, q, propertyQ):
+	def parseQ(self, q, propertyQ, normalizationCallback):
 		"""
 		Обработка поискового запроса
 
 		:param q:  поисковый запрос
 		:param propertyQ:  параметры запроса
+		:param normalizationCallback:  колбэк для нормализации текста
 		:return:  тип запроса, обработанный запрос
 		"""
 		return None
@@ -32,7 +36,7 @@ class ParserQ():
 	@abstractmethod
 	def parseSourceNameQ(self, q, propertyQ):
 		"""
-		Обработка поискового завпроса по именам источников
+		Обработка поискового запроса по именам источников
 
 		:param q:  поисковый запрос
 		:param propertyQ:  параметры запроса
@@ -108,8 +112,26 @@ class SimpleParserQ(ParserQ):
 
 		return logic_exp
 
-	def parseQ(self, q, propertyQ):
-		pass
+	def parseQ(self, q, propertyQ, normalizationCallback):
+		"""
+		Обработка поискового запроса по именам источников
+
+		:param q:  поисковый запрос
+		:param propertyQ:  параметры запроса
+		:param normalizationCallback:  колбэк для нормализации текста
+		:return:  тип запроса, слова поискового запроса без повторения
+		"""
+		# TODO проверить кодировки
+		if not q:
+			raise ParamError("Empty query")
+
+		if not normalizationCallback:
+			raise ParamError("normalizationCallback cannot be the None-object")
+		if not isinstance(normalizationCallback, Normalization):
+			raise TypeError("normalizationCallback can be the list Normalization")
+
+		return [TYPE_Q_FULL, normalizationCallback.normalizeTextWithoutRepetition(q)]
+
 
 	def _addNode(self, listNode, last, cur, query, exceptionMessage):
 		"""Добавление слагаемого"""
