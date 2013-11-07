@@ -15,7 +15,6 @@ from statistic4text.utils.source_data_utils import FileSourceCustom
 from iRetrieval.errors.errors import ParamError
 from iRetrieval.utils.save_utils import ISaveRetrievalUtils
 from iRetrieval.utils.normalization_utils import FileNameNormalization
-from iRetrieval.utils.save_utils import FILENAME_PATH_TYPE, FILENAME_TYPE
 from iRetrieval.utils.read_datasource_utils import ReaderSourceData, SourceCustomCallback
 
 
@@ -120,8 +119,8 @@ class DataSourceWorkerFS(DataSourceWorker):
 			name_node = os.path.split(file_data['dict_name'])
 			try:
 				paths = parseSourceNameCallback.normalizeTextWithoutRepetition(name_node[0].encode("utf-8"))
-				saveSourceUtils.saveFilename(file_data['_id'], paths, FILENAME_PATH_TYPE)
 				names = parseSourceNameCallback.normalizeTextWithoutRepetition(name_node[1].encode("utf-8"))
-				saveSourceUtils.saveFilename(file_data['_id'], names, FILENAME_TYPE)
+				names.extend(paths)
+				saveSourceUtils.saveFilename(file_data['_id'], list(set(names)))
 			except IndexError or ParamError as e:  # если вдруг - пустое значение
 				pass

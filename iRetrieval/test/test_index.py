@@ -31,12 +31,11 @@ class TestMongoIndex(unittest.TestCase):
 		db = "statistic"
 		fc_n = "files"
 		fc_dn = "files_data"
-		snc = "source_names"
 		mdn = "test_merge_dict"
 		self.__dirPath = os.path.abspath(os.curdir)
 		firstPath = os.path.join(self.__dirPath, "resources/first")
 		secondPath = os.path.join(self.__dirPath, "resources/second")
-		self.__mongoUtils = MongoSaveRetrievalUtils(h, p, usr, pwd, db, fc_n, fc_dn, snc, mdn)
+		self.__mongoUtils = MongoSaveRetrievalUtils(h, p, usr, pwd, db, fc_n, fc_dn, mdn)
 		self.__mongoUtilsTypeError = MongoSaveUtils(h, p, usr, pwd, db, fc_n, fc_dn, mdn)
 		self.__mongoReadUtils = MongoReadUtils(h, p, usr, pwd, db, fc_n, fc_dn)
 		self.__smN = SimpleNormalization()

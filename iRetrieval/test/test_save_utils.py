@@ -5,11 +5,12 @@ __author__ = 'romus'
 
 
 import unittest
+import datetime
 
 from statistic4text.errors.errors import DataNotFound
 
 from iRetrieval.errors.errors import ParamError
-from iRetrieval.utils.save_utils import MongoSaveRetrievalUtils, FILENAME_TYPE
+from iRetrieval.utils.save_utils import MongoSaveRetrievalUtils
 
 
 class TestMongoSaveRetrievalUtils(unittest.TestCase):
@@ -22,9 +23,8 @@ class TestMongoSaveRetrievalUtils(unittest.TestCase):
 		db = "statistic"
 		fc_n = "files"
 		fc_dn = "files_data"
-		snc = "source_names"
 		mdn = "test_merge_dict"
-		self.__mongoUtils = MongoSaveRetrievalUtils(h, p, usr, pwd, db, fc_n, fc_dn, snc, mdn)
+		self.__mongoUtils = MongoSaveRetrievalUtils(h, p, usr, pwd, db, fc_n, fc_dn, mdn)
 
 	def tearDown(self):
 		try:
@@ -33,14 +33,13 @@ class TestMongoSaveRetrievalUtils(unittest.TestCase):
 			pass
 
 	def testSaveFilename(self):
-		self.__mongoUtils.saveFilename(1, ["one", "test", "run"], FILENAME_TYPE)
+		retID = self.__mongoUtils.saveDict("testing name", "utf-8", 1234, {"the": 1, "test": 2},
+			"utf-8", datetime.datetime.now())
+		self.__mongoUtils.saveFilename(retID, ["one", "test", "run"])
 
 	def testSaveFilenameException(self):
-		self.assertRaises(ParamError, self.__mongoUtils.saveFilename, None, 2, 3)
-		self.assertRaises(ParamError, self.__mongoUtils.saveFilename, 1, None, 3)
-		self.assertRaises(ParamError, self.__mongoUtils.saveFilename, 1, 2, None)
-		self.assertRaises(TypeError, self.__mongoUtils.saveFilename, 1, 2, 3)
-		self.assertRaises(TypeError, self.__mongoUtils.saveFilename, 1, ["one"], "text type")
-		self.assertRaises(TypeError, self.__mongoUtils.saveFilename, 1, ["one"], 3)
+		self.assertRaises(ParamError, self.__mongoUtils.saveFilename, None, 2)
+		self.assertRaises(ParamError, self.__mongoUtils.saveFilename, 1, None)
+		self.assertRaises(TypeError, self.__mongoUtils.saveFilename, 1, 2)
 		self.__mongoUtils.deleteMergeDict()
-		self.assertRaises(DataNotFound, self.__mongoUtils.saveFilename, 1, ["one"], FILENAME_TYPE)
+		self.assertRaises(DataNotFound, self.__mongoUtils.saveFilename, 1, ["one"])
