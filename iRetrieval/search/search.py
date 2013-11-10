@@ -33,3 +33,13 @@ class Search():
 		return None
 
 
+class MongoSearch(Search):
+
+	def __init__(self):
+		pass
+
+	def searchNames(self, query):
+		return None
+
+	def searchData(self, query):
+		return None

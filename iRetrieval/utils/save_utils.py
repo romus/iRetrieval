@@ -4,11 +4,11 @@
 __author__ = 'romus'
 
 
-import pymongo
 import zope.interface
 
 from statistic4text.utils.save_utils import MongoSaveUtils
 from iRetrieval.errors.errors import ParamError
+
 
 class ISaveRetrievalUtils(zope.interface.Interface):
 	""" Интерфейс """
@@ -25,9 +25,6 @@ class ISaveRetrievalUtils(zope.interface.Interface):
 
 class MongoSaveRetrievalUtils(MongoSaveUtils):
 
-	INDEX_FIELDS_SOURCE_NAME_COLLECTION = [("dict_id", pymongo.DESCENDING),
-										   ("file_name_type", pymongo.DESCENDING),
-										   ("merge_dict_id", pymongo.DESCENDING)]
 	zope.interface.implements(ISaveRetrievalUtils)
 
 	def saveFilename(self, dictID, names):
@@ -43,7 +40,7 @@ class MongoSaveRetrievalUtils(MongoSaveUtils):
 			raise ParamError("names cannot be the None-object")
 
 		if not isinstance(names, list):
-			raise TypeError("names can be the list list")
+			raise TypeError("names can be the list")
 
 		self._checkExistMergeDict()
 		in_d = {"$set": {"names": names}}
