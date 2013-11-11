@@ -10,21 +10,14 @@ import datetime
 from statistic4text.errors.errors import DataNotFound
 
 from iRetrieval.errors.errors import ParamError
+from iRetrieval.test.connection_configs import *
 from iRetrieval.utils.save_utils import MongoSaveRetrievalUtils
 
 
 class TestMongoSaveRetrievalUtils(unittest.TestCase):
 
 	def setUp(self):
-		h = "192.168.0.80"
-		p = 27017
-		usr = "statistic"
-		pwd = "statistic"
-		db = "statistic"
-		fc_n = "files"
-		fc_dn = "files_data"
-		mdn = "test_merge_dict"
-		self.__mongoUtils = MongoSaveRetrievalUtils(h, p, usr, pwd, db, fc_n, fc_dn, mdn)
+		self.__mongoUtils = MongoSaveRetrievalUtils(HOST, PORT, USR, PWD, DB, FC_N, FC_DN, MDN)
 
 	def tearDown(self):
 		try:

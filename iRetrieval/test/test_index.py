@@ -15,6 +15,7 @@ from statistic4text.utils.normalization_utils import SimpleNormalization
 
 from iRetrieval.index.index import MongoIndex
 from iRetrieval.errors.errors import ParamError
+from iRetrieval.test.connection_configs import *
 from iRetrieval.utils.save_utils import MongoSaveRetrievalUtils
 from iRetrieval.utils.normalization_utils import FileNameNormalization
 from iRetrieval.utils.datasource_worker_utils import DataSourceWorkerFS
@@ -24,20 +25,12 @@ from iRetrieval.utils.read_datasource_utils import FSSourceCustomCallback, Reade
 class TestMongoIndex(unittest.TestCase):
 
 	def setUp(self):
-		h = "192.168.0.80"
-		p = 27017
-		usr = "statistic"
-		pwd = "statistic"
-		db = "statistic"
-		fc_n = "files"
-		fc_dn = "files_data"
-		mdn = "test_merge_dict"
 		self.__dirPath = os.path.abspath(os.curdir)
 		firstPath = os.path.join(self.__dirPath, "resources/first")
 		secondPath = os.path.join(self.__dirPath, "resources/second")
-		self.__mongoUtils = MongoSaveRetrievalUtils(h, p, usr, pwd, db, fc_n, fc_dn, mdn)
-		self.__mongoUtilsTypeError = MongoSaveUtils(h, p, usr, pwd, db, fc_n, fc_dn, mdn)
-		self.__mongoReadUtils = MongoReadUtils(h, p, usr, pwd, db, fc_n, fc_dn)
+		self.__mongoUtils = MongoSaveRetrievalUtils(HOST, PORT, USR, PWD, DB, FC_N, FC_DN, MDN)
+		self.__mongoUtilsTypeError = MongoSaveUtils(HOST, PORT, USR, PWD, DB, FC_N, FC_DN, MDN)
+		self.__mongoReadUtils = MongoReadUtils(HOST, PORT, USR, PWD, DB, FC_N, FC_DN)
 		self.__smN = SimpleNormalization()
 		self.__fbs = FileBlockSource()
 		self.__scc = FSSourceCustomCallback()
