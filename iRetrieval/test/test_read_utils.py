@@ -39,24 +39,28 @@ class TestMongoSearchRetrievalUtils(unittest.TestCase):
 	def testSearchFilename(self):
 		mongoSearch = MongoSearchRetrievalUtils(HOST, PORT, USR, PWD, DB, FC_N, FC_DN)
 		customDict = {"result_cn": "rcn"}
-		findObject = mongoSearch.searchFilename([TYPE_Q_LOGIC, [["doc"], ["doc"]]], customDict)
+		mdID = self.mongoSaveUtils.getMergeDictID()
+		findObject = mongoSearch.searchFilename([TYPE_Q_LOGIC, [["doc"], ["doc"]]], customDict, mdID)
 		self.assertIsNotNone(findObject, "findObject == None")
 		mongoSearch.removeSearchData(findObject)
 
 	def testSearchFilenameException(self):
 		mongoSearch = MongoSearchRetrievalUtils(HOST, PORT, USR, PWD, DB, FC_N, FC_DN)
 		customDict = {"result_cn": "rcn"}
-		self.assertRaises(ParamError, mongoSearch.searchFilename, None, customDict)
-		self.assertRaises(ParamError, mongoSearch.searchFilename, [TYPE_Q_LOGIC, [["doc"], ["doc"]]], None)
-		self.assertRaises(TypeError, mongoSearch.searchFilename, "string", customDict)
-		self.assertRaises(TypeError, mongoSearch.searchFilename, [TYPE_Q_LOGIC, [["doc"], ["doc"]]], "string")
-		self.assertRaises(KeyError, mongoSearch.searchFilename, [TYPE_Q_LOGIC, [["doc"], ["doc"]]], {"aa": 10})
+		mdID = self.mongoSaveUtils.getMergeDictID()
+		self.assertRaises(ParamError, mongoSearch.searchFilename, None, customDict, mdID)
+		self.assertRaises(ParamError, mongoSearch.searchFilename, [TYPE_Q_LOGIC, [["doc"], ["doc"]]], None, mdID)
+		self.assertRaises(ParamError, mongoSearch.searchFilename, [TYPE_Q_LOGIC, [["doc"], ["doc"]]], customDict, None)
+		self.assertRaises(TypeError, mongoSearch.searchFilename, "string", customDict, mdID)
+		self.assertRaises(TypeError, mongoSearch.searchFilename, [TYPE_Q_LOGIC, [["doc"], ["doc"]]], "string", mdID)
+		self.assertRaises(KeyError, mongoSearch.searchFilename, [TYPE_Q_LOGIC, [["doc"], ["doc"]]], {"aa": 10}, mdID)
 
 	def testGetSearchData(self):
 		mongoSearch = MongoSearchRetrievalUtils(HOST, PORT, USR, PWD, DB, FC_N, FC_DN)
 		customDict = {"result_cn": "rcn"}
 		customDictData = {"is_lazy": False}
-		findObject = mongoSearch.searchFilename([TYPE_Q_LOGIC, [["doc"], ["doc"]]], customDict)
+		mdID = self.mongoSaveUtils.getMergeDictID()
+		findObject = mongoSearch.searchFilename([TYPE_Q_LOGIC, [["doc"], ["doc"]]], customDict, mdID)
 
 		result = mongoSearch.getSearchData(findObject, customDictData)
 		for doc in result:
@@ -72,7 +76,8 @@ class TestMongoSearchRetrievalUtils(unittest.TestCase):
 		mongoSearch = MongoSearchRetrievalUtils(HOST, PORT, USR, PWD, DB, FC_N, FC_DN)
 		customDict = {"result_cn": "rcn"}
 		customDictData = {"is_lazy": False}
-		findObject = mongoSearch.searchFilename([TYPE_Q_LOGIC, [["doc"], ["doc"]]], customDict)
+		mdID = self.mongoSaveUtils.getMergeDictID()
+		findObject = mongoSearch.searchFilename([TYPE_Q_LOGIC, [["doc"], ["doc"]]], customDict, mdID)
 
 		self.assertRaises(ParamError, mongoSearch.getSearchData, None, customDictData)
 		self.assertRaises(ParamError, mongoSearch.getSearchData, findObject, None)
