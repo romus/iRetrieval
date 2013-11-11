@@ -121,6 +121,6 @@ class DataSourceWorkerFS(DataSourceWorker):
 				paths = parseSourceNameCallback.normalizeTextWithoutRepetition(name_node[0].encode("utf-8"))
 				names = parseSourceNameCallback.normalizeTextWithoutRepetition(name_node[1].encode("utf-8"))
 				names.extend(paths)
-				saveSourceUtils.saveFilename(file_data['_id'], list(set(names)))
+				saveSourceUtils.saveFilename(file_data['_id'], list(set(names)), name_node[1])
 			except IndexError or ParamError as e:  # если вдруг - пустое значение
 				pass

@@ -25,12 +25,20 @@ mapFunction = """
 					if (is_found == 1) {
 						var temp_value = {
 							count: 1,
-							dictName: this.dict_name
+							dictName: this.dict_name,
+							simple_name: this.simple_name
 						};
 						emit(this._id, temp_value);
 					}
 				}
-			}  // if (type_q == 1)
+			}  else if (type_q == 1 && this.simple_name.valueOf() == q.valueOf()) {
+				var temp_value = {
+					count: 1,
+					dictName: this.dict_name,
+					simple_name: this.simple_name
+				};
+				emit(this._id, temp_value);
+			}
 		}
 	"""
 
@@ -40,6 +48,8 @@ reduceFunction = """
 			for (var i = 0; i < values.length; i++) {
 				total += values[i].count;
 			}
-			return {count: total, dictName: values[0].dictName};
+			return {count: total,
+					dictName: values[0].dictName,
+					simple_name: values[0].simple_name};
 		}
 	"""
