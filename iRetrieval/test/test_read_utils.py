@@ -11,8 +11,8 @@ from statistic4text.errors.errors import DataNotFound
 
 from iRetrieval.errors.errors import ParamError
 from iRetrieval.test.connection_configs import *
-from iRetrieval.parser.parser_q import TYPE_Q_LOGIC, TYPE_Q_EXACT
 from iRetrieval.utils.save_utils import MongoSaveRetrievalUtils
+from iRetrieval.parser.parser_q import TYPE_Q_LOGIC, TYPE_Q_EXACT
 from iRetrieval.utils.read_utils import MongoSearchRetrievalUtils
 
 
@@ -73,6 +73,7 @@ class TestMongoSearchRetrievalUtils(unittest.TestCase):
 			self.assertEqual(int(doc["value"]["count"]), 2, "count != 2")
 
 		# запрос точного совпадения
+		customDictData["is_lazy"] = False
 		findObject = mongoSearch.searchFilename([TYPE_Q_EXACT, "some doc~"], customDict, mdID)
 		result = mongoSearch.getSearchData(findObject, customDictData)
 		for doc in result:
