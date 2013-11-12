@@ -116,4 +116,5 @@ class MongoSearchRetrievalUtils(MongoReadUtils):
 		Временно
 		@param findObject:  объект, полученный searchFilename(...)
 		"""
-		findObject.remove()
+		if findObject:
+			findObject.remove()
