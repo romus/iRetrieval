@@ -8,7 +8,7 @@ mapFunction = """
 		function map() {
 			// В качестве глобольного параметра используется:
 			// q - выражение с запросом  [[слово1, слово2], [слово3, ...], ...],
-			// type_q - тип поискового запроса - 0 - логический запрос, 1 - точный запрос
+			// type_q - тип поискового запроса - 0 - логический запрос, 1 - точный запрос, 2 - неточный запрос
 
 			if (type_q == 0) {
 				for (var i = 0; i < q.length; i++) {
@@ -31,7 +31,7 @@ mapFunction = """
 						emit(this._id, temp_value);
 					}
 				}
-			}  else if (type_q == 1 && this.simple_name.valueOf() == q.valueOf()) {
+			}  else if ( (type_q == 1 || type_q == 2) && this.simple_name.valueOf() == q.valueOf()) {
 				var temp_value = {
 					count: 1,
 					dictName: this.dict_name,

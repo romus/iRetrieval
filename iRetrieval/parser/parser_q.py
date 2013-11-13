@@ -13,7 +13,7 @@ from iRetrieval.errors.errors import ParamError
 
 TYPE_Q_LOGIC = 0  # логический поисковый запрос
 TYPE_Q_EXACT = 1  # точный поисковый запрос
-TYPE_Q_IMPRECISE = 2  # неточный поисковый запрос
+TYPE_Q_IMPRECISE = 2  # like-запрос
 TYPE_Q_FULL = 3  # полнотестовый поисковый запрос
 
 
