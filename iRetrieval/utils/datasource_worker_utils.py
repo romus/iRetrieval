@@ -3,19 +3,25 @@
 
 __author__ = 'romus'
 
-
 import os
+# import magic
 from abc import ABCMeta, abstractmethod
 
 from statistic4text.statistic.statistic import Statistic
 from statistic4text.utils.save_utils import MongoSaveUtils
 from statistic4text.utils.read_utils import MongoReadUtils
 from statistic4text.utils.source_data_utils import FileSourceCustom
+from statistic4text.utils.source_data_utils import FILE_BLOCK_SOURCE_TYPE
 
 from iRetrieval.errors.errors import ParamError
 from iRetrieval.utils.save_utils import ISaveRetrievalUtils
+from iRetrieval.utils.source_data_utils import SourceFactoryImpl, OF_FILE_SOURCE
 from iRetrieval.utils.normalization_utils import FileNameNormalization
 from iRetrieval.utils.read_datasource_utils import ReaderSourceData, SourceCustomCallback
+
+
+MIME_TEXT = "text/plain"
+MIME_WORD = "application/msword"
 
 
 class DataSourceWorker():
@@ -24,13 +30,12 @@ class DataSourceWorker():
 	__metaclass__ = ABCMeta
 
 	@abstractmethod
-	def createStatistics(self, statisticObject, readerSourceData, normalization, source, sourceCustomCallback=None):
+	def createStatistics(self, statisticObject, readerSourceData, normalization, sourceCustomCallback=None):
 		"""
 		Создание статистики по объектам и данным из файловой системы
 
 		:param statisticObject:  объект для создания статистики
 		:param readerSourceData:  объект для получения настроект для работы с источниками
-		:param source:  объект для чтения данных из источника
 		:param normalization:  объект для нормализации данных
 		:param sourceCustomCallback:  колбэк для объекта получения настроек
 		"""
@@ -53,14 +58,15 @@ class DataSourceWorkerFS(DataSourceWorker):
 	""" Класс для создания статистики по файлам (работа с файловой системой) """
 
 	def __init__(self):
-		pass
+		source_factory = SourceFactoryImpl()
+		self._source = {'text': source_factory.createSource(FILE_BLOCK_SOURCE_TYPE),
+						'word': source_factory.createSource(OF_FILE_SOURCE)}
 
-	def createStatistics(self, statisticObject, readerSourceData, source, normalization, sourceCustomCallback=None):
+	def createStatistics(self, statisticObject, readerSourceData, normalization, sourceCustomCallback=None):
 		"""
 
 		:param statisticObject:  объект для создания статистики
 		:param readerSourceData:  объект для получения полных путей к файлам
-		:param source:  объект для чтения данных из файла
 		:param normalization:  объект для нормализации данных
 		:param sourceCustomCallback:  колбэк для объекта получения настроек (верификация путей)
 		"""
@@ -79,9 +85,19 @@ class DataSourceWorkerFS(DataSourceWorker):
 
 		fileSourceCustom = FileSourceCustom()
 		for itemFile in readerSourceData.getSourceCustom(sourceCustomCallback):
-			# TODO определение типа файла
+			"""
+			file_type = magic.from_file(itemFile, mime=True)
 			fileSourceCustom.custom = itemFile
-			statisticObject.makeDocStatisticCustom(source, fileSourceCustom, normalization)
+
+			source = None
+			if file_type == MIME_TEXT:
+				source = self._source['text']
+			elif file_type == MIME_WORD:
+				source = self._source['word']
+
+			if source:
+				statisticObject.makeDocStatisticCustom(source, fileSourceCustom, normalization)
+			"""
 
 	def createSourceNameIndex(self, statisticObject, readSourceUtils, saveSourceUtils, parseSourceNameCallback):
 		"""
@@ -122,5 +138,5 @@ class DataSourceWorkerFS(DataSourceWorker):
 				names = parseSourceNameCallback.normalizeTextWithoutRepetition(name_node[1].encode("utf-8"))
 				names.extend(paths)
 				saveSourceUtils.saveFilename(file_data['_id'], list(set(names)), name_node[1])
-			except IndexError or ParamError as e:  # если вдруг - пустое значение
+			except IndexError or ParamError:  # если вдруг - пустое значение
 				pass

@@ -22,14 +22,13 @@ class Index():
 	__metaclass__ = ABCMeta
 
 	@abstractmethod
-	def createStatistics(self, dataSourceWorker, readerSourceData, source, normalization, sourceCustomCallback=None):
+	def createStatistics(self, dataSourceWorker, readerSourceData, normalization, sourceCustomCallback=None):
 		"""
 		Создание статистики по источникам
 		(должен вызываться до методов создания индекса)
 
 		:param dataSourceWorker:  объект для работы с источниками (настроки для работы с источниками и тд)
 		:param readerSourceData:  объект для получения настроект для работы с источниками
-		:param source:  объект для чтения данных из источника
 		:param normalization:  объект для нормализации данных
 		:param sourceCustomCallback:  колбэк для объекта получения настроек
 		"""
@@ -88,13 +87,13 @@ class MongoIndex(Index):
 		self.__mongoReadUtils = mongoReadUtils
 		self.__ms = StatisticFactory().createStatistic(MONGO_TYPE, self.__mongoSaveUtils)
 
-	def createStatistics(self, dataSourceWorker, readerSourceData, source, normalization, sourceCusCallback=None):
+	def createStatistics(self, dataSourceWorker, readerSourceData, normalization, sourceCusCallback=None):
 		if not dataSourceWorker:
 			raise ParamError("dataSourceWorker cannot be the None-object")
 		if not isinstance(dataSourceWorker, DataSourceWorker):
 			raise TypeError("mongoUtils can be the list MongoSaveUtils")
 
-		dataSourceWorker.createStatistics(self.__ms, readerSourceData, source, normalization, sourceCusCallback)
+		dataSourceWorker.createStatistics(self.__ms, readerSourceData, normalization, sourceCusCallback)
 
 	def createTotalStatistics(self):
 		self.__ms.makeTotalStatistic()

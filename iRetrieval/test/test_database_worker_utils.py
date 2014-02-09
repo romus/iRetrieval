@@ -9,7 +9,6 @@ import unittest
 
 from statistic4text.errors.errors import DataNotFound
 from statistic4text.utils.read_utils import MongoReadUtils
-from statistic4text.utils.source_data_utils import FileBlockSource
 from statistic4text.utils.normalization_utils import SimpleNormalization
 from statistic4text.statistic.statistic import StatisticFactory, MONGO_TYPE
 
@@ -31,7 +30,6 @@ class TestDataSourceWorkerFS(unittest.TestCase):
 		self.__mongoReadUtils = MongoReadUtils(HOST, PORT, USR, PWD, DB, FC_N, FC_DN)
 		self.__simN = SimpleNormalization()
 		self.__simNamesN = FileNameNormalization()
-		self.__fbs = FileBlockSource()
 		self.__ms = StatisticFactory().createStatistic(MONGO_TYPE, self.__mongoSaveUtils)
 		self.__scc = FSSourceCustomCallback()
 		self.__rnFS = ReaderNameFS([firstPath, secondPath])
@@ -44,19 +42,19 @@ class TestDataSourceWorkerFS(unittest.TestCase):
 
 	def testCreateStatistics(self):
 		fsWorker = DataSourceWorkerFS()
-		fsWorker.createStatistics(self.__ms, self.__rnFS, self.__fbs, self.__simN, self.__scc)
+		fsWorker.createStatistics(self.__ms, self.__rnFS, self.__simN, self.__scc)
 
 	def testCreateStatisticsException(self):
 		fsWorker = DataSourceWorkerFS()
-		self.assertRaises(ParamError, fsWorker.createStatistics, None, 2, 3, 4, 5)
-		self.assertRaises(TypeError, fsWorker.createStatistics, 1, 2, 3, 4, 5)
-		self.assertRaises(ParamError, fsWorker.createStatistics, self.__ms, None, 3, 4, 5)
-		self.assertRaises(TypeError, fsWorker.createStatistics, self.__ms, 2, 3, 4, 5)
-		self.assertRaises(TypeError, fsWorker.createStatistics, self.__ms, self.__rnFS, self.__fbs, self.__simN, 5)
+		self.assertRaises(ParamError, fsWorker.createStatistics, None, 2, 3, 4)
+		self.assertRaises(TypeError, fsWorker.createStatistics, 1, 2, 3, 4)
+		self.assertRaises(ParamError, fsWorker.createStatistics, self.__ms, None, 3, 4)
+		self.assertRaises(TypeError, fsWorker.createStatistics, self.__ms, 2, 3, 4)
+		self.assertRaises(TypeError, fsWorker.createStatistics, self.__ms, self.__rnFS, self.__simN, 5)
 
 	def testCreateSourceNameIndex(self):
 		fsWorker = DataSourceWorkerFS()
-		fsWorker.createStatistics(self.__ms, self.__rnFS, self.__fbs, self.__simN, self.__scc)
+		fsWorker.createStatistics(self.__ms, self.__rnFS, self.__simN, self.__scc)
 		fsWorker.createSourceNameIndex(self.__ms, self.__mongoReadUtils, self.__mongoSaveUtils, self.__simNamesN)
 
 	def testCreateSourceNameIndexException(self):

@@ -3,12 +3,14 @@
 
 __author__ = 'romus'
 
-
 import os
 
 from docx import opendocx, getdocumenttext
 
-from statistic4text.utils.source_data_utils import FileSource
+from statistic4text.utils.source_data_utils import FileSource, SourceFactory
+
+
+OF_FILE_SOURCE = "office_file_source"
 
 
 class OfficeFileSource(FileSource):
@@ -48,3 +50,15 @@ class OfficeFileSource(FileSource):
 
 	def getSourceDateModified(self, source):
 		return os.path.getmtime(os.path.abspath(source[1]))
+
+
+class SourceFactoryImpl(SourceFactory):
+
+	def createSource(self, source_type):
+		"""
+		Создание объекта для работы с истоником данных
+
+		:param source_type:  тип источника данных
+		:return:  объект для работы с источником данных
+		"""
+		return OfficeFileSource() if source_type == OF_FILE_SOURCE else SourceFactory.createSource(self, source_type)

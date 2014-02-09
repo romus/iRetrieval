@@ -10,7 +10,6 @@ import unittest
 from statistic4text.errors.errors import DataNotFound
 from statistic4text.utils.save_utils import MongoSaveUtils
 from statistic4text.utils.read_utils import MongoReadUtils
-from statistic4text.utils.source_data_utils import FileBlockSource
 from statistic4text.utils.normalization_utils import SimpleNormalization
 
 from iRetrieval.index.index import MongoIndex
@@ -32,7 +31,6 @@ class TestMongoIndex(unittest.TestCase):
 		self.__mongoUtilsTypeError = MongoSaveUtils(HOST, PORT, USR, PWD, DB, FC_N, FC_DN, MDN)
 		self.__mongoReadUtils = MongoReadUtils(HOST, PORT, USR, PWD, DB, FC_N, FC_DN)
 		self.__smN = SimpleNormalization()
-		self.__fbs = FileBlockSource()
 		self.__scc = FSSourceCustomCallback()
 		self.__rFS = ReaderNameFS([firstPath, secondPath])
 		self.__fsWorker = DataSourceWorkerFS()
@@ -43,7 +41,7 @@ class TestMongoIndex(unittest.TestCase):
 
 	def testCreateStatistics(self):
 		mongoIndex = MongoIndex(self.__mongoUtils, self.__mongoReadUtils)
-		mongoIndex.createStatistics(self.__fsWorker, self.__rFS, self.__fbs, self.__smN, self.__scc)
+		mongoIndex.createStatistics(self.__fsWorker, self.__rFS, self.__smN, self.__scc)
 
 	def testInitException(self):
 		self.assertRaises(ParamError, MongoIndex, None, self.__mongoReadUtils)
@@ -54,13 +52,13 @@ class TestMongoIndex(unittest.TestCase):
 
 	def testCreateStatisticsException(self):
 		mongoIndex = MongoIndex(self.__mongoUtils, self.__mongoReadUtils)
-		self.assertRaises(ParamError, mongoIndex.createStatistics, None, self.__rFS, self.__fbs, self.__smN, self.__scc)
-		self.assertRaises(TypeError, mongoIndex.createStatistics, "1", self.__rFS, self.__fbs, self.__smN, self.__scc)
+		self.assertRaises(ParamError, mongoIndex.createStatistics, None, self.__rFS, self.__smN, self.__scc)
+		self.assertRaises(TypeError, mongoIndex.createStatistics, "1", self.__rFS, self.__smN, self.__scc)
 
 	def testCreateSourceNameIndex(self):
 		mongoIndex = MongoIndex(self.__mongoUtils, self.__mongoReadUtils)
 		simNamesN = FileNameNormalization()
-		mongoIndex.createStatistics(self.__fsWorker, self.__rFS, self.__fbs, self.__smN, self.__scc)
+		mongoIndex.createStatistics(self.__fsWorker, self.__rFS, self.__smN, self.__scc)
 		mongoIndex.createSourceNameIndex(self.__fsWorker, simNamesN)
 
 	def testCreateSourceNameIndexException(self):
