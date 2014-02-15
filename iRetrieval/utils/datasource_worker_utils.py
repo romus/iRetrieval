@@ -4,12 +4,13 @@
 __author__ = 'romus'
 
 import os
-# import magic
+import magic
 from abc import ABCMeta, abstractmethod
 
 from statistic4text.statistic.statistic import Statistic
 from statistic4text.utils.save_utils import MongoSaveUtils
 from statistic4text.utils.read_utils import MongoReadUtils
+from statistic4text.utils.normalization_utils import DetectEncoding
 from statistic4text.utils.source_data_utils import FileSourceCustom
 from statistic4text.utils.source_data_utils import FILE_BLOCK_SOURCE_TYPE
 
@@ -83,10 +84,10 @@ class DataSourceWorkerFS(DataSourceWorker):
 		if sourceCustomCallback and not isinstance(sourceCustomCallback, SourceCustomCallback):
 			raise TypeError("sourceCustomCallback can be the list SourceCustomCallback")
 
+		de_object = DetectEncoding()
 		fileSourceCustom = FileSourceCustom()
 		for itemFile in readerSourceData.getSourceCustom(sourceCustomCallback):
-			"""
-			file_type = magic.from_file(itemFile, mime=True)
+			file_type = magic.from_file(itemFile.decode(de_object.getEncode(itemFile)), mime=True)
 			fileSourceCustom.custom = itemFile
 
 			source = None
@@ -97,7 +98,6 @@ class DataSourceWorkerFS(DataSourceWorker):
 
 			if source:
 				statisticObject.makeDocStatisticCustom(source, fileSourceCustom, normalization)
-			"""
 
 	def createSourceNameIndex(self, statisticObject, readSourceUtils, saveSourceUtils, parseSourceNameCallback):
 		"""
