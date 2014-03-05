@@ -53,3 +53,23 @@ reduceFunction = """
                     simple_name: values[0].simple_name};
         }
     """
+
+#  функции для поиска по данным
+mapFunctionData = """
+        function map() {
+            for (var i = q.length - 1; i >= 0; i--) {
+                if (q[i] === this.word)
+                    emit(this._id, {count: 1})
+            };
+        }
+    """
+
+reduceFunctionData = """
+        function reduce(key, values) {
+            var total = 0;
+            for (var i = values.length - 1; i >= 0; i--)
+                total += values[i].count;
+
+            return {count: total};
+        }
+    """

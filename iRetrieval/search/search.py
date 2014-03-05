@@ -30,11 +30,14 @@ class Search():
         return None
 
     @abstractmethod
-    def searchData(self, query):
+    def searchData(self, query, customDict, customDictData, mergeDictID):
         """
         Поиск по данным из источников
 
         :param query:  поисковый запрос
+        :param customDict:  словарь с настройками для поиска по именам
+        :param customDictData:  настройки для получения данных
+        :param mergeDictID:  ID основного словаря
         :return:  список найденных документов
         """
         return None
@@ -68,12 +71,27 @@ class MongoSearch(Search):
         :param mergeDictID:  ID основного словаря
         :return:  список найденных документов (может использоваться ленивое получение данных)
         """
-        self.removeFindObject()
-        self._findObject = self._mongoReadUtils.searchFilename(query, customDict, mergeDictID)
-        return self._mongoReadUtils.getSearchData(self._findObject, customDictData)
+        # self.removeFindObject()
+        # self._findObject = self._mongoReadUtils.searchFilename(query, customDict, mergeDictID)
+        # return self._mongoReadUtils.getSearchData(self._findObject, customDictData)
+        return self._search(query, customDict, customDictData, mergeDictID, self._mongoReadUtils.searchFilename)
 
-    def searchData(self, query):
-        return None
+    def searchData(self, query, customDict, customDictData, mergeDictID):
+        """
+        Поиск по данным из источников
+
+        :param query:  поисковый запрос c указанием типа, например [тип_запроса, ["test", "search", "inner"]].
+        :param customDict:  словарь с настройками для поиска по данным из источников
+        :param customDictData:  настройки для получения данных
+        :param mergeDictID:  ID основного словаря
+        :return:  список найденных документов (может использоваться ленивое получение данных)
+        """
+        return self._search(query, customDict, customDictData, mergeDictID, self._mongoReadUtils.searchData)
 
     def removeFindObject(self):
         self._mongoReadUtils.removeSearchData(self._findObject)
+
+    def _search(self, query, customDict, customDictData, mergeDictID, func):
+        self.removeFindObject()
+        self._findObject = func(query, customDict, mergeDictID)
+        return self._mongoReadUtils.getSearchData(self._findObject, customDictData)

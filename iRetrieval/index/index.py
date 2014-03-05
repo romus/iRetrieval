@@ -3,6 +3,7 @@
 
 __author__ = 'romus'
 
+
 from abc import ABCMeta, abstractmethod
 
 from statistic4text.utils.save_utils import MongoSaveUtils

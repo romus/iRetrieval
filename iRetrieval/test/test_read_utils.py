@@ -3,6 +3,7 @@
 
 __author__ = 'romus'
 
+
 import unittest
 import datetime
 
@@ -54,12 +55,32 @@ class TestMongoSearchRetrievalUtils(unittest.TestCase):
         self.assertRaises(TypeError, mongoSearch.searchFilename, [TYPE_Q_LOGIC, [["doc"], ["doc"]]], "string", mdID)
         self.assertRaises(KeyError, mongoSearch.searchFilename, [TYPE_Q_LOGIC, [["doc"], ["doc"]]], {"aa": 10}, mdID)
 
+    def testSearchData(self):
+        mongoSearch = MongoSearchRetrievalUtils(HOST, PORT, USR, PWD, DB, FC_N, FC_DN)
+        customDict = {"result_cn": "rcd"}
+        mdID = self.mongoSaveUtils.getMergeDictID()
+        findObject = mongoSearch.searchData([None, ["the"]], customDict, mdID)
+        self.assertIsNotNone(findObject, "findObject == None")
+        mongoSearch.removeSearchData(findObject)
+
+    def testSearchDataException(self):
+        mongoSearch = MongoSearchRetrievalUtils(HOST, PORT, USR, PWD, DB, FC_N, FC_DN)
+        customDict = {"result_cn": "rcd"}
+        mdID = self.mongoSaveUtils.getMergeDictID()
+        self.assertRaises(ParamError, mongoSearch.searchData, None, customDict, mdID)
+        self.assertRaises(ParamError, mongoSearch.searchData, [None, [["doc"], ["doc"]]], None, mdID)
+        self.assertRaises(ParamError, mongoSearch.searchData, [None, [["doc"], ["doc"]]], customDict, None)
+        self.assertRaises(TypeError, mongoSearch.searchData, "string", customDict, mdID)
+        self.assertRaises(TypeError, mongoSearch.searchData, [None, [["doc"], ["doc"]]], "string", mdID)
+        self.assertRaises(KeyError, mongoSearch.searchData, [None, [["doc"], ["doc"]]], {"aa": 10}, mdID)
+
     def testGetSearchData(self):
         mongoSearch = MongoSearchRetrievalUtils(HOST, PORT, USR, PWD, DB, FC_N, FC_DN)
         customDict = {"result_cn": "rcn"}
         customDictData = {"is_lazy": False}
         mdID = self.mongoSaveUtils.getMergeDictID()
 
+        # поиск по именам источников
         # логический запрос
         findObject = mongoSearch.searchFilename([TYPE_Q_LOGIC, [["doc"], ["doc"]]], customDict, mdID)
         result = mongoSearch.getSearchData(findObject, customDictData)
@@ -83,6 +104,22 @@ class TestMongoSearchRetrievalUtils(unittest.TestCase):
             self.assertIsNotNone(doc, "map-reduce doc == None")
 
         mongoSearch.removeSearchData(findObject)
+
+        # поиск по данным из источника
+        customDict["result_cn"] = "rcd"
+        customDictData["is_lazy"] = False
+        findObject = mongoSearch.searchData([None, ["the"]], customDict, mdID)
+        result = mongoSearch.getSearchData(findObject, customDictData)
+        for doc in result:
+            self.assertIsNotNone(doc, "map-reduce doc == None")
+        customDictData["is_lazy"] = True
+        result = mongoSearch.getSearchData(findObject, customDictData)
+        for doc in result:
+            self.assertIsNotNone(doc, "map-reduce doc == None")
+            self.assertEqual(int(doc["value"]["count"]), 1, "count != 1")
+
+        mongoSearch.removeSearchData(findObject)
+
 
     def testGetSearchDataException(self):
         mongoSearch = MongoSearchRetrievalUtils(HOST, PORT, USR, PWD, DB, FC_N, FC_DN)
